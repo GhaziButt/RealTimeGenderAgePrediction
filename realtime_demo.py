@@ -68,9 +68,9 @@ class FaceCV(object):
 
     def detect_face(self):
         face_cascade = cv2.CascadeClassifier(self.CASE_PATH)
-         # 0 means the default video capture device in OS
+        
         video_capture = cv2.VideoCapture(0)
-        # infinite loop, break by key ESC
+       
 
 
 
@@ -82,7 +82,7 @@ class FaceCV(object):
         while True:
             if not video_capture.isOpened():
                 sleep(5)
-            # Capture frame-by-frame
+           
             ret, frame = video_capture.read()
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(
@@ -91,7 +91,7 @@ class FaceCV(object):
                 minNeighbors=10,
                 minSize=(self.face_size, self.face_size)
             )
-            # placeholder for cropped faces
+           
             face_imgs = np.empty((len(faces), self.face_size, self.face_size, 3))
             for i, face in enumerate(faces):
                 face_img, cropped = self.crop_face(frame, face, margin=40, size=self.face_size)
@@ -99,12 +99,12 @@ class FaceCV(object):
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 200, 0), 2)
                 face_imgs[i,:,:,:] = face_img
             if len(face_imgs) > 0:
-                # predict ages and genders of the detected faces
+                
                 results = self.model.predict(face_imgs)
                 predicted_genders = results[0]
                 ages = np.arange(0, 101).reshape(101, 1)
                 predicted_ages = results[1].dot(ages).flatten()
-            # draw results
+           
             alpha = 0.1
 
 
@@ -128,13 +128,12 @@ class FaceCV(object):
                     foreground = four
 
 
-                frame = cv2.flip(frame, 1)
-                # Select the region in the background where we want to add the image and add the images using cv2.addWeighted()
+                frame = cv2.flip(frame, 1) 
                 added_image = cv2.addWeighted(frame[350:450, 350:450, :], alpha, foreground[0:100, 0:100, :], 1 - alpha,
                                               0)
-                # Change the region with the result
+               
                 frame[350:450, 350:450] = added_image
-                # For displaying current value of alpha(weights)
+               
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(frame, 'alpha:{}'.format(alpha), (10, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
@@ -146,7 +145,7 @@ class FaceCV(object):
             cv2.imshow('Keras Faces', frame)
             if cv2.waitKey(5) == 27:  # ESC key press
                 break
-        # When everything is done, release the capture
+       
         video_capture.release()
         cv2.destroyAllWindows()
 
