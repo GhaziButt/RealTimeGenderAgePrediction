@@ -35,11 +35,7 @@ class WideResNet:
 
     def _wide_basic(self, n_input_plane, n_output_plane, stride):
         def f(net):
-            # format of conv_params:
-            #               [ [kernel_size=("kernel width", "kernel height"),
-            #               strides="(stride_vertical,stride_horizontal)",
-            #               padding="same" or "valid"] ]
-            # B(3,3): orignal <<basic>> block
+            
             conv_params = [[3, 3, stride, "same"],
                            [3, 3, (1, 1), "same"]]
 
@@ -74,10 +70,7 @@ class WideResNet:
                                           kernel_regularizer=l2(self._weight_decay),
                                           use_bias=self._use_bias)(convs)
 
-            # Shortcut Connection: identity function or 1x1 convolutional
-            #  (depends on difference between input & output shape - this
-            #   corresponds to whether we are using the first block in each
-            #   group; see _layer() ).
+            
             if n_input_plane != n_output_plane:
                 shortcut = Conv2D(n_output_plane, kernel_size=(1, 1),
                                          strides=stride,
@@ -93,7 +86,7 @@ class WideResNet:
         return f
 
 
-    # "Stacking Residual Units on the same stage"
+   
     def _layer(self, block, n_input_plane, n_output_plane, count, stride):
         def f(net):
             net = block(n_input_plane, n_output_plane, stride)(net)
@@ -103,7 +96,7 @@ class WideResNet:
 
         return f
 
-#    def create_model(self):
+
     def __call__(self):
         logging.debug("Creating model...")
 
